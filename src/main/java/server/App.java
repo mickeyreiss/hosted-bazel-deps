@@ -7,6 +7,10 @@ import static spark.Spark.*;
 
 public class App {
     public static void main(String[] args) {
+        if (args.length > 0) {
+            port(Integer.parseInt(args[0]));
+        }
+
         after((request, response) -> {
             response.header("Server", "Hosted-Bazel-Deps");
             response.header("X-Credit-Where-Credit-Is-Due", "https://github.com/pgr0ss/bazel-deps");
