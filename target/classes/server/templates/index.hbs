@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+    <title>Bazel Deps{{#query}} - {{.}}{{/query}}</title>
+    <style>
+        body {
+        color: black;
+        font-family: "Helvetica-Ultralight","Helvetica",sans-serif;
+        font-size: 26pt;
+        font-weight: lighter;
+        }
+        form {
+        margin: 2em auto;
+        text-align: center;
+        }
+        input {
+        border-bottom: 1px solid #7B7B7B;
+        border: none;
+        margin: auto;
+        outline: none;
+        text-align: left;
+        width: 90%;
+        }
+        pre {
+        font-size: 12pt;
+        margin: auto;
+        width: 75%;
+        }
+    </style>
+</head>
+<body>
+<form onsubmit="return false;">
+    <input type="text" name="q" id="q" placeholder="group:artifact:version" value="{{query}}" oninput="handleInput(this)">
+</form>
+<div class="result">
+    <pre id="maven_dependencies">
+        {{mavenDependencies}}
+    </pre>
+</div>
+<script>
+var mavenDependencies = $("#maven_dependencies");
+var $q = $("#q");
+var runQuery = _.debounce(function (q, skipPushState) {
+    if (q) {
+        console.warn("Running query: ", q);
+        var newUrl = "/" + q;
+        var title = q ? "Bazel Deps - " + q : "Bazel Deps";
+        if (!skipPushState) {
+            history.pushState({"q": q}, title, newUrl);
+        }
+        $.post(newUrl).then(function (body) {
+            mavenDependencies.html(body);
+        });
+    } else {
+        mavenDependencies.html("");
+    }
+}, 500);
+
+var handleInput = function(input) {
+    runQuery($(input).val());
+};
+
+
+window.addEventListener('popstate', function(event) {
+    debugger;
+    if (event.state) {
+        $q.val(event.state.q);
+        runQuery(event.state.q, true);
+    }
+});
+</script>
+</body>
+</html>
