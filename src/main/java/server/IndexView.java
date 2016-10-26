@@ -22,6 +22,10 @@ public class IndexView {
         return query;
     }
 
+    public String getGoogleAnalyticsId() {
+      return System.getenv("GOOGLE_ANALYTICS_ID");
+    }
+
     public String getMavenDependencies() {
         return mavenDependencies;
     }
